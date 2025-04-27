@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Yapay Zekâ Kod Üretici</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text: #111827;
+      --text-sub: #6b7280;
+      --border: #e5e7eb;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 36rem;
+    }
+    h1 {
+      margin: 0 0 0.25rem;
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    p.lead {
+      margin: 0 0 1.5rem;
+      color: var(--text-sub);
+      text-align: center;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      margin-bottom: 1.5rem;
+    }
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      resize: vertical;
+      min-height: 6rem;
+    }
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.375rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+    .spinner {
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      width: 1rem;
+      height: 1rem;
+      margin-left: 0.5rem;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+    .loading .spinner {
+      display: inline-block;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    #result {
+      display: none;
+    }
+    #result.show {
+      display: block;
+    }
+    #result-title {
+      margin: 0 0 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    #result-code {
+      background: #f9fafb;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Yapay Zekâ Destekli Kod Üretici</h1>
+    <p class="lead">Python kodu ve başlık üretmek için prompt’unu girin ve “Üret”e tıklayın.</p>
+
+    <div class="card">
+      <form id="prompt-form">
+        <textarea id="prompt" placeholder="Örneğin: Bir listeyi tersine çeviren Python fonksiyonu yaz"></textarea>
+        <div style="text-align:right; margin-top:1rem;">
+          <button id="submit-btn" type="submit">
+            Üret
+            <span class="spinner" id="spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div id="result" class="card">
+      <h2 id="result-title"></h2>
+      <pre id="result-code"></pre>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('prompt-form');
+    const btn = document.getElementById('submit-btn');
+    const spinner = document.getElementById('spinner');
+    const result = document.getElementById('result');
+    const titleEl = document.getElementById('result-title');
+    const codeEl = document.getElementById('result-code');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const prompt = document.getElementById('prompt').value.trim();
+      if (!prompt) return;
+
+      // Butonu devre dışı bırak + spinner
+      btn.disabled = true;
+      form.classList.add('loading');
+      titleEl.textContent = '';
+      codeEl.textContent = '';
+      result.classList.remove('show');
+
+      try {
+        const res = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+        if (!res.ok) throw await res.json();
+        const data = await res.json();
+
+        titleEl.textContent = data.title;
+        codeEl.textContent = data.code;
+        result.classList.add('show');
+      } catch (err) {
+        titleEl.textContent = 'Hata!';
+        codeEl.textContent = err.detail || JSON.stringify(err);
+        result.classList.add('show');
+      } finally {
+        btn.disabled = false;
+        form.classList.remove('loading');
+      }
+    });
+  </script>
+</body>
+</html>

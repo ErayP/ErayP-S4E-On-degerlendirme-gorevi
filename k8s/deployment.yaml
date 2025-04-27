@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-code-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-code-generator
+  template:
+    metadata:
+      labels:
+        app: llm-code-generator
+    spec:
+      containers:
+      - name: api
+        image: eraypolatdocker/llm-code-generator:latest  
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: OLLAMA_URL
+          value: "http://host.docker.internal:11434"
+        - name: OLLAMA_MODEL
+          value: "llama3:latest"
+
+

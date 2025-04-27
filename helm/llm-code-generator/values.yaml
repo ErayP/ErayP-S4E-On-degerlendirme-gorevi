@@ -1,0 +1,17 @@
+image:
+  repository: eraypolatdocker/llm-code-generator
+  tag: v9
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 8000
+  nodePort: 30081
+
+ollama:
+  # artık cluster içindeki 'ollama' servisi değil,
+  # host.docker.internal ile host makinenizi işaret ediyoruz:
+  url: http://host.docker.internal:11434
+  model: llama3:latest
+
+replicaCount: 1

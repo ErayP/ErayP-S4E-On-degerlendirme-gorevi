@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "llm-code-generator.fullname" . }}
+  labels:
+    app: {{ include "llm-code-generator.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "llm-code-generator.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "llm-code-generator.name" . }}
+    spec:
+      containers:
+      - name: api
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+        env:
+        - name: OLLAMA_URL
+          value: "{{ .Values.ollama.url }}"
+        - name: OLLAMA_MODEL
+          value: "{{ .Values.ollama.model }}"
