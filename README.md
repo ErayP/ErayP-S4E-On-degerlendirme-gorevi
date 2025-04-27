@@ -4,7 +4,7 @@
 
 ---
 
-## ⚙️ Özellikler
+## Özellikler
 
 - **Prompt → Kod**: Kullanıcının girdiği doğal dil prompt’unu alır  
 - **Başlık**: Üretilen kodu özetleyen kısa, anlamlı bir başlık döner  
@@ -15,7 +15,7 @@
 
 ---
 
-## 📦 Gereksinimler
+## Gereksinimler
 
 - Python 3.11+  
 - [Ollama](https://ollama.com) (ve indirilmiş `llama3:latest` modeli)  
